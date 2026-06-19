@@ -37,22 +37,28 @@ npm install
 npm run build
 ```
 
-Create a local environment file:
+Run the interactive login:
+
+```powershell
+npm run login
+```
+
+The login command prompts for your Garmin email and password, authenticates once, and writes reusable session tokens to `.garmin-tokens`. Your password is not written to disk.
+
+Create a local environment file only if you want to customize settings:
 
 ```powershell
 Copy-Item .env.example .env
 ```
 
-Configure Garmin credentials in `.env`:
+Example `.env`:
 
 ```env
-GARMIN_EMAIL=you@example.com
-GARMIN_PASSWORD=your-password
 GARMIN_TOKEN_DIR=.garmin-tokens
 GARMIN_IS_CN=false
 ```
 
-The server stores reusable Garmin session tokens in `GARMIN_TOKEN_DIR`. Keep this directory private and do not commit it.
+You can also set `GARMIN_EMAIL` and `GARMIN_PASSWORD` in `.env` for non-interactive environments, but the recommended local setup is `npm run login`.
 
 ## Claude Desktop Configuration
 
@@ -92,6 +98,7 @@ If Garmin data is unavailable, say that plainly and fall back to normal workload
 
 ```powershell
 npm run dev
+npm run login
 npm run typecheck
 npm run build
 ```

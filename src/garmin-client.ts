@@ -40,7 +40,7 @@ export class GarminClient {
     if (!this.config.email || !this.config.password) {
       throw new Error(
         `Garmin credentials are missing and no valid token cache was found at ${this.config.tokenDir}. ` +
-          "Set GARMIN_EMAIL and GARMIN_PASSWORD, or run once with credentials so tokens can be cached.",
+          "Run `npm run login` from the server directory to create a token cache, or set GARMIN_EMAIL and GARMIN_PASSWORD.",
       );
     }
 

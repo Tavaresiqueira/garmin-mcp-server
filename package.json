@@ -3,13 +3,14 @@
   "version": "1.0.0",
   "description": "Model Context Protocol server for Garmin Connect wellbeing metrics.",
   "main": "dist/index.js",
-  "type": "module",
   "bin": {
-    "garmin-mcp-server": "dist/index.js"
+    "garmin-mcp-server": "dist/index.js",
+    "garmin-mcp-login": "dist/login.js"
   },
   "scripts": {
     "build": "tsc -p tsconfig.json",
     "dev": "tsx src/index.ts",
+    "login": "tsx src/login.ts",
     "start": "node dist/index.js",
     "typecheck": "tsc -p tsconfig.json --noEmit"
   },
