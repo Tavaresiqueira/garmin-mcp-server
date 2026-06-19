@@ -1,50 +1,62 @@
 # Garmin MCP Server
 
-MCP server that lets an agent read Garmin Connect recovery metrics before planning heavy work.
+Garmin MCP Server exposes Garmin Connect wellness and recovery metrics to MCP-compatible AI assistants. It helps agents incorporate sleep, recovery, and training context when planning work.
 
-It is inspired by the Oura Ring MCP idea: your physical context enters the agent loop, so the same agent helping you ship code can also notice when Garmin says your recovery is poor.
+## Capabilities
 
-## What It Exposes
+- Fetch daily wellbeing snapshots from Garmin Connect
+- Summarize sleep, Body Battery, HRV, stress, Training Readiness, and training status
+- Recommend an appropriate workload level from current recovery signals
+- Provide a guardrail tool for assistants before accepting heavy workloads
+- Cache Garmin session tokens locally to avoid repeated logins
 
-Tools:
+## MCP Tools
 
-- `garmin_wellbeing_snapshot`: sleep, Body Battery, HRV, stress, Training Readiness, training status, and a workload recommendation.
-- `garmin_workload_guard`: checks a proposed workload and suggests a safer scope when recovery signals are weak.
-- `garmin_sleep_summary`: focused sleep context.
+| Tool | Description |
+| --- | --- |
+| `garmin_wellbeing_snapshot` | Returns a concise daily snapshot with recovery metrics and workload recommendation. |
+| `garmin_workload_guard` | Evaluates a proposed workload against current Garmin recovery signals. |
+| `garmin_sleep_summary` | Returns focused sleep and recovery context for a given date. |
 
-Resource:
+## MCP Resource
 
-- `garmin://wellbeing/today`: today's snapshot as JSON.
+| Resource | Description |
+| --- | --- |
+| `garmin://wellbeing/today` | Today's wellbeing snapshot as JSON. |
 
-Prompt:
+## MCP Prompt
 
-- `garmin_workload_guardrails`: system-style instructions for agents to proactively check Garmin before agreeing to heavy work.
+| Prompt | Description |
+| --- | --- |
+| `garmin_workload_guardrails` | Instructions for using Garmin context during workload planning. |
 
-## Setup
-
-Install and build:
+## Installation
 
 ```powershell
 npm install
 npm run build
 ```
 
-Create a local `.env` file:
+Create a local environment file:
 
 ```powershell
 Copy-Item .env.example .env
 ```
 
-Fill in either:
+Configure Garmin credentials in `.env`:
 
-- `GARMIN_EMAIL` and `GARMIN_PASSWORD`
-- or `GARMINCONNECT_EMAIL` and `GARMINCONNECT_BASE64_PASSWORD`, matching the `garmin-grafana` style.
+```env
+GARMIN_EMAIL=you@example.com
+GARMIN_PASSWORD=your-password
+GARMIN_TOKEN_DIR=.garmin-tokens
+GARMIN_IS_CN=false
+```
 
-The server caches Garmin OAuth tokens in `.garmin-tokens` by default after the first successful login. You can override this with `GARMIN_TOKEN_DIR`.
+The server stores reusable Garmin session tokens in `GARMIN_TOKEN_DIR`. Keep this directory private and do not commit it.
 
-## Claude Desktop Config
+## Claude Desktop Configuration
 
-Add this server to your Claude Desktop MCP config:
+Add the server to your Claude Desktop MCP configuration:
 
 ```json
 {
@@ -60,11 +72,9 @@ Add this server to your Claude Desktop MCP config:
 }
 ```
 
-If you do not use `.env`, put `GARMIN_EMAIL` and `GARMIN_PASSWORD` in the `env` block.
+You can also place `GARMIN_EMAIL` and `GARMIN_PASSWORD` in the `env` block instead of using `.env`.
 
-## Agent Instructions
-
-Use this as Claude/Codex project guidance:
+## Recommended Agent Guidance
 
 ```text
 Use Garmin context as part of planning, especially when I propose a heavy workload, late-day push, risky refactor, production change, or many tickets in one day.
@@ -78,8 +88,16 @@ Do not moralize or diagnose health. Treat the metrics as planning context, not m
 If Garmin data is unavailable, say that plainly and fall back to normal workload planning.
 ```
 
-## Notes
+## Development
 
-This uses the unofficial Garmin Connect web APIs through the `garmin-connect` npm package. Garmin can change these endpoints or rate-limit repeated logins, so token reuse matters.
+```powershell
+npm run dev
+npm run typecheck
+npm run build
+```
 
-Your local `garmin-grafana` setup uses the Python `garminconnect`/`garth` token store under `garminconnect-tokens`. This TypeScript server keeps its own Node-compatible token cache and does not read the Python token format directly.
+## Security
+
+- Do not commit `.env` or token cache directories.
+- Prefer token reuse over repeated credential logins.
+- Treat all Garmin data as private health-related context.
