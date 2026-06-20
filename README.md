@@ -139,16 +139,16 @@ Add the server to your Claude Desktop MCP configuration:
   "mcpServers": {
     "garmin": {
       "command": "node",
-      "args": ["C:\\Users\\joao.siqueira\\Documents\\garmin-mcp-server\\dist\\index.js"],
+      "args": ["C:\\path\\to\\garmin-mcp-server\\dist\\index.js"],
       "env": {
-        "GARMIN_TOKEN_DIR": "C:\\Users\\joao.siqueira\\Documents\\garmin-mcp-server\\.garmin-tokens"
+        "GARMIN_TOKEN_DIR": "C:\\path\\to\\garmin-mcp-server\\.garmin-tokens"
       }
     }
   }
 }
 ```
 
-Use your own absolute paths for `dist\\index.js` and `.garmin-tokens`.
+Replace `C:\\path\\to\\garmin-mcp-server` with the absolute path where you cloned the project.
 
 You can also place `GARMIN_EMAIL` and `GARMIN_PASSWORD` in the `env` block instead
 of using token login, but token login is preferred for local machines because it
@@ -164,10 +164,10 @@ If your MCP client uses a TOML-style server config, the same setup looks like th
 ```toml
 [mcp_servers.garmin]
 command = "node"
-args = ["C:\\Users\\joao.siqueira\\Documents\\garmin-mcp-server\\dist\\index.js"]
+args = ["C:\\path\\to\\garmin-mcp-server\\dist\\index.js"]
 
 [mcp_servers.garmin.env]
-GARMIN_TOKEN_DIR = "C:\\Users\\joao.siqueira\\Documents\\garmin-mcp-server\\.garmin-tokens"
+GARMIN_TOKEN_DIR = "C:\\path\\to\\garmin-mcp-server\\.garmin-tokens"
 ```
 
 Restart Codex after updating the config. Once loaded, the Garmin tools should be
