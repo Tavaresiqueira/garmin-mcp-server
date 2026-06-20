@@ -22,6 +22,20 @@ export function toIsoDate(date: Date): string {
   return date.toLocaleDateString("en-CA");
 }
 
+export function addDays(date: Date, days: number): Date {
+  const shifted = new Date(date);
+  shifted.setDate(shifted.getDate() + days);
+  return shifted;
+}
+
+export function dateRangeEndingOn(endDate: Date, days: number): Date[] {
+  if (!Number.isInteger(days) || days <= 0) {
+    throw new Error(`Expected a positive integer day count, received "${days}".`);
+  }
+
+  return Array.from({ length: days }, (_, index) => addDays(endDate, index - (days - 1)));
+}
+
 export function secondsToHours(seconds: unknown): number | null {
   if (typeof seconds !== "number" || !Number.isFinite(seconds)) {
     return null;

@@ -9,6 +9,7 @@ import { z } from "zod";
 import { loadConfig } from "./config.js";
 import { parseGarminDate } from "./date.js";
 import { GarminClient } from "./garmin-client.js";
+import { getBaselineProfile, getChangeAlerts, getTrainingLoadTrend } from "./history.js";
 import { getWellbeingSnapshot } from "./wellbeing.js";
 
 const config = loadConfig();
@@ -29,6 +30,69 @@ function jsonContent(data: unknown) {
     ],
   };
 }
+
+server.registerTool(
+  "garmin_training_load_trend",
+  {
+    title: "Garmin training load trend",
+    description:
+      "Return short and long window trends for sleep, overnight HRV, stress, training readiness, and Body Battery at wake.",
+    inputSchema: {
+      date: z.string().optional().describe("End date in YYYY-MM-DD format. Defaults to today."),
+      shortWindowDays: z.number().int().min(3).max(14).optional().describe("Short trend window. Defaults to 7."),
+      longWindowDays: z.number().int().min(7).max(56).optional().describe("Long trend window. Defaults to 28."),
+    },
+  },
+  async ({ date, shortWindowDays, longWindowDays }) => {
+    const trend = await getTrainingLoadTrend(
+      garmin,
+      parseGarminDate(date),
+      shortWindowDays ?? 7,
+      longWindowDays ?? 28,
+    );
+    return jsonContent(trend);
+  },
+);
+
+server.registerTool(
+  "garmin_baseline_profile",
+  {
+    title: "Garmin baseline profile",
+    description:
+      "Compute personal baseline ranges over a historical window for sleep, sleep score, HRV, stress, training readiness, and Body Battery at wake.",
+    inputSchema: {
+      date: z.string().optional().describe("End date in YYYY-MM-DD format. Defaults to today."),
+      windowDays: z.number().int().min(14).max(90).optional().describe("Historical baseline window. Defaults to 42."),
+    },
+  },
+  async ({ date, windowDays }) => {
+    const baseline = await getBaselineProfile(garmin, parseGarminDate(date), windowDays ?? 42);
+    return jsonContent(baseline);
+  },
+);
+
+server.registerTool(
+  "garmin_change_alerts",
+  {
+    title: "Garmin change alerts",
+    description:
+      "Highlight meaningful changes versus yesterday and versus baseline, such as sleep drops, HRV dips, stress spikes, and readiness declines.",
+    inputSchema: {
+      date: z.string().optional().describe("Date in YYYY-MM-DD format. Defaults to today."),
+      baselineWindowDays: z
+        .number()
+        .int()
+        .min(14)
+        .max(56)
+        .optional()
+        .describe("Historical window used for baseline comparisons. Defaults to 28."),
+    },
+  },
+  async ({ date, baselineWindowDays }) => {
+    const alerts = await getChangeAlerts(garmin, parseGarminDate(date), baselineWindowDays ?? 28);
+    return jsonContent(alerts);
+  },
+);
 
 server.registerTool(
   "garmin_wellbeing_snapshot",
